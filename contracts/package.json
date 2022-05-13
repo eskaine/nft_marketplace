@@ -3,13 +3,16 @@
   "scripts": {
     "node": "npx hardhat node",
     "test": "npx hardhat test",
-    "compile": "npx hardhat compile"
+    "compile": "npx hardhat compile",
+    "lint": "./node_modules/.bin/prettier --write contracts/**/*.sol"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-truffle5": "^2.0.6",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "chai": "^4.3.6",
     "hardhat": "^2.9.5",
+    "prettier": "^2.6.2",
+    "prettier-plugin-solidity": "^1.0.0-beta.19",
     "web3": "^1.7.3"
   },
   "dependencies": {

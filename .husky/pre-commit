@@ -1,9 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-lint
-lint
-lint
-lint
-npm run prettier:solidity
-npm run prettier:solidity
+npm run lint
