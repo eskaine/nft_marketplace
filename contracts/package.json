@@ -1,5 +1,5 @@
 {
-  "name": "hardhat-project",
+  "name": "nft-marketplace-contracts",
   "scripts": {
     "node": "npx hardhat node",
     "test": "npx hardhat test",
