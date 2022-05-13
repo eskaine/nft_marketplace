@@ -13,7 +13,13 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "prettier:solidity"
+      "pre-commit": "lint"
     }
+  },
+  "lint": {
+    "*.{sol}": [
+      "prettier --single-quote --write",
+      "git add"
+    ]
   }
 }
