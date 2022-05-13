@@ -11,6 +11,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "watch": "nodemon index.js",
+    "dev": "concurrently \"npm run watch \" \"npm run start\" ",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -33,6 +35,8 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.7",
+    "concurrently": "^7.1.0",
+    "nodemon": "^2.0.16",
     "postcss": "^8.4.13",
     "tailwindcss": "^3.0.24"
   }

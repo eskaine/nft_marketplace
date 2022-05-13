@@ -1,8 +1,7 @@
 body {
   margin: 0 auto;
-  text-align: center;
 }
 
-header {
-  font-size: 3em;
+.container {
+  width: 80%;
 }

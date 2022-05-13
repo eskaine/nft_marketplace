@@ -1,8 +1,13 @@
-function App() {
+import Navbar from './components/Navbar/Navbar';
+import Main from './components/Main/Main';
+import Footer from './components/Footer/Footer';
+
+const App = () => {
   return (
     <div className="App">
-      <header>NFT Marketplace
-      </header>
+      <Navbar />
+      <Main />
+      <Footer />
     </div>
   );
 }
