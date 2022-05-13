@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
-import './Navbar.css';
 
 class Navbar extends Component {
   render() {
     return (
       <div>
-        <div className="container">
+        <div className="container mx-auto flex justify-between">
               <span>NFT Marketplace</span>
               <button>Login with Metamask</button>
           </div>
