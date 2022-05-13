@@ -2,7 +2,8 @@
   "name": "nft-marketplace",
   "scripts": {
     "solhint": "./node_modules/.bin/solhint -f table contracts/contracts/**/*.sol",
-    "prettier:solidity": "./node_modules/.bin/prettier --write contracts/contracts/**/*.sol"
+    "prettier:solidity": "./node_modules/.bin/prettier --write contracts/contracts/**/*.sol",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "husky": "^8.0.1",
@@ -13,13 +14,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint"
+      "pre-commit": "npm run prettier:solidity"
     }
-  },
-  "lint": {
-    "*.{sol}": [
-      "prettier --single-quote --write",
-      "git add"
-    ]
   }
 }
