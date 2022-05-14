@@ -1,16 +1,18 @@
-import React, { Component } from 'react'
+import React, { useContext } from 'react';
+import Button from './shared/Button';
+import { EthersContext } from '../utils/EthersProvider';
 
-class Navbar extends Component {
-  render() {
+function Navbar () {
+  const { setAccount, userAccount } = useContext(EthersContext);
+  
     return (
       <div>
         <div className='container mx-auto flex justify-between'>
-              <span className='font-bold text-white'>NFT Marketplace</span>
-              <button className='rounded-full px-4 py-2 bg-blue-600 text-white'>Login with Metamask</button>
+            <span className='font-bold text-white'>NFT MARKETPLACE</span>
+            {!userAccount && <Button bgColor='primary-color' name='Login with Metamask' onClick={setAccount} />}
           </div>
       </div>
-    )
-  }
+    );
 }
 
 export default Navbar;
