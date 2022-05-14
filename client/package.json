@@ -6,6 +6,7 @@
     "@headlessui/react": "^1.6.1",
     "@heroicons/react": "^1.0.6",
     "ethers": "^5.6.5",
+    "prop-types": "^15.8.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-scripts": "5.0.1"
@@ -15,6 +16,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "watch": "nodemon index.js",
+    "lint": "esw -w src --ext .js --ext .jsx --fix",
     "dev": "concurrently \"npm run watch \" \"npm run start\" ",
     "eject": "react-scripts eject"
   },
@@ -39,6 +41,13 @@
   "devDependencies": {
     "autoprefixer": "^10.4.7",
     "concurrently": "^7.1.0",
+    "eslint": "^8.15.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.29.4",
+    "eslint-plugin-react-hooks": "^4.5.0",
+    "eslint-watch": "^8.0.0",
     "nodemon": "^2.0.16",
     "postcss": "^8.4.13",
     "tailwindcss": "^3.0.24"
