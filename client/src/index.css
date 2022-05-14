@@ -5,9 +5,9 @@
 body {
   margin: 0 auto;
   margin-top: 1em;
-  background-color: #24262C;
-}
-
-.container {
-  width: 80%;
+  background: url(assets/background.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }
