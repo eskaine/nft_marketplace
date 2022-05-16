@@ -1,11 +1,22 @@
-import React, { Component } from 'react';
+import React from 'react';
+import NFTDisplay from './shared/NFTDisplay';
 
-class Main extends Component {
-  render() {
-    return (
-      <div />
-    );
-  }
+function Main() {
+  return (
+    <main className="container mx-auto mt-10">
+      <div>NFT List</div>
+      <div className="flex justify-center flex-wrap">
+        <NFTDisplay label="Sample" owner="Nobody" price="500" />
+        <NFTDisplay label="Sample" owner="Nobody" price="500" />
+        <NFTDisplay label="Sample" owner="Nobody" price="500" />
+        <NFTDisplay label="Sample" owner="Nobody" price="500" />
+        <NFTDisplay label="Sample" owner="Nobody" price="500" />
+        <NFTDisplay label="Sample" owner="Nobody" price="500" />
+        <NFTDisplay label="Sample" owner="Nobody" price="500" />
+        <NFTDisplay label="Sample" owner="Nobody" price="500" />
+      </div>
+    </main>
+  );
 }
 
 export default Main;

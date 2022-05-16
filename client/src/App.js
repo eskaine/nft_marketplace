@@ -1,5 +1,5 @@
 import React from 'react';
-import { EthersProvider } from './utils/EthersProvider';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Main from './components/Main';
 import Footer from './components/Footer';
@@ -9,13 +9,17 @@ import './styles/base.css';
 
 function App() {
   return (
-    <EthersProvider>
-      <div className="App">
+    <div className="App">
+      <div className="container mx-auto">
         <Navbar />
-        <Main />
+        <Routes>
+          <Route path="/" element={<Main />} />
+          {/* <Route path="about" element={<About />} /> */}
+        </Routes>
+
         <Footer />
       </div>
-    </EthersProvider>
+    </div>
   );
 }
 

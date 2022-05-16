@@ -1,11 +1,15 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class Footer extends Component {
-  render() {
-    return (
-      <div />
-    );
-  }
+function Footer() {
+  return (
+    <div>
+      <hr className="border-gray-400" />
+      <div className="my-5 flex justify-between">
+        <div>© 2022. All Rights Reserved - NFT Marketplace</div>
+        <div>Privacy Policy | Terms of Use</div>
+      </div>
+    </div>
+  );
 }
 
 export default Footer;

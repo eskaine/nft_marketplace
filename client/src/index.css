@@ -4,7 +4,7 @@
 
 body {
   margin: 0 auto;
-  margin-top: 1em;
+  color: white;
   background: url(assets/background.jpg) no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;

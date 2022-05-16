@@ -1,10 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import { EthersProvider } from './utils/EthersProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <EthersProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </EthersProvider>
   </React.StrictMode>,
 );
