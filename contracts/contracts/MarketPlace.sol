@@ -19,6 +19,7 @@ contract MarketPlace is ERC721URIStorage {
         string label;
         address currentOwner;
         uint256 price;
+        bool isListed;
     }
     event account_created(string username);
     event account_existed(string username);
@@ -26,6 +27,7 @@ contract MarketPlace is ERC721URIStorage {
     // itemId -> Item
     mapping(uint256 => NFT) private items;
     mapping(address => string) private users; //address to username, need this?
+    uint256[] items_listed;
     
     //address -> list of id for the NFTs owned by this address? 
     mapping(address => uint256[] ) private itemsbyaddress;
@@ -43,7 +45,7 @@ contract MarketPlace is ERC721URIStorage {
     }
 
     function addNFT(string memory label, string memory username, uint256 price) public {
-        require(price >= 0, "price more than 0"); //price is what unit? ether?
+        require(price >= 0, "price less than 0"); //price is what unit? ether? can this price be 0? if 0 means not listed?
         require(keccak256(abi.encodePacked((users[msg.sender]))) == keccak256(abi.encodePacked((username))), "not valid account"); //need this?
         //require (address(owner) != msg.sender);
         // what params is pass in? check client
@@ -57,11 +59,12 @@ contract MarketPlace is ERC721URIStorage {
         _setTokenURI(newItemId, label);
         
         NFT memory newNFT = NFT(
-            label, msg.sender, price
+            label, msg.sender, price, false
         );
         
         items[newItemId] = newNFT;
         //add to the itemsbyaddress
+        itemsbyaddress[msg.sender].push(newItemId);
         
 
         // To push to blockchain, finish the above and we can proceed with this next
@@ -82,4 +85,20 @@ contract MarketPlace is ERC721URIStorage {
         //remove id from itemsbyaddress
     }
     
+    //To list the NFT on the marketplace
+    function listNFT(uint256 id) public payable {
+        //Make sure only owner of NFT can do this
+        require(msg.sender == items[id].currentOwner);
+        require(items[id].price > 0);
+        require(msg.value == 0);
+        items[id].isListed = true;
+    }
+
+    function delistNFT(uint256 id)public payable{
+        //Make sure only owner of NFT can do this
+        require(msg.sender == items[id].currentOwner);
+        require(items[id].isListed == true, "Item is not listed");
+        require(msg.value == 0);
+        items[id].isListed = false;
+    }
 }
