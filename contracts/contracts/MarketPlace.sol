@@ -25,7 +25,11 @@ contract MarketPlace {
 
     // itemId -> Item
     mapping(uint256 => NFT) private items;
-    mapping(string => User) private users;
+
+    //? what is wrong with this mapping? 
+    //? what if user created multiple NFTs?
+    mapping(string => User) private users; 
+
     
 
     constructor() {
@@ -39,6 +43,7 @@ contract MarketPlace {
     event invalid_user( string owner );
     event valid_user( string owner );
 
+    //? something is wrong with this func, read my comments
     function registerAccount( string memory owner ) public {
         if ( users[ owner ].userAddress != address( 0 ) )
             emit account_existed( owner );
@@ -47,6 +52,11 @@ contract MarketPlace {
             emit account_created( owner );
     }
 
+    //????? owner is the address of this contract,  
+    //????? msg.sender is the address of the user calling the function within this contract
+    //?? if u understand the implications of the above 2 lines, please fix wherever is appropriate
+
+    //?? this is unnecessary
     function getAddressOfOwner( string memory owner ) public view
         returns (address) {
         return users[owner].userAddress;
