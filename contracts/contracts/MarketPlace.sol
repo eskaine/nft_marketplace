@@ -1,85 +1,85 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "hardhat/console.sol";
-import "./TheNFT.sol";
 
-contract MarketPlace {
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MarketPlace is ERC721URIStorage {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
+
+    constructor() ERC721("TheNFT", "NFT") {}
+    
     // Variables
-    TheNFT _NFT;
     //address payable public immutable feeAccount; // the account that receives fees
     struct NFT{
         string label;
-        string owner;
+        address currentOwner;
         uint256 price;
     }
-
-    struct User {
-        address userAddress;
-
-        //string password;
-    }
-
-    uint256 numOfNfts;
+    event account_created(string username);
+    event account_existed(string username);
 
     // itemId -> Item
     mapping(uint256 => NFT) private items;
-
-    //? what is wrong with this mapping? 
-    //? what if user created multiple NFTs?
-    mapping(string => User) private users; 
-
+    mapping(address => string) private users; //address to username, need this?
     
+    //address -> list of id for the NFTs owned by this address? 
+    mapping(address => uint256[] ) private itemsbyaddress;
 
-    constructor() {
-        // what should be in here?
-        //feeAccount = payable(msg.sender);
-        //feePercent = _feePercent;
-    }
-    event account_existed( string owner);
-    event account_created( string owner );
-
-    event invalid_user( string owner );
-    event valid_user( string owner );
-
-    //? something is wrong with this func, read my comments
-    function registerAccount( string memory owner ) public {
-        if ( users[ owner ].userAddress != address( 0 ) )
-            emit account_existed( owner );
-        else
-            users[ owner ].userAddress = msg.sender;
-            emit account_created( owner );
+    function registerAccount( string memory username ) public {
+        require( msg.sender != address(0) );
+        if ( bytes(users[msg.sender]).length == 0 ) //username is empty = account not created
+        {
+            users[msg.sender] = username;
+            emit account_created(username);
+        }
+        else{
+            emit account_existed(username);
+        }
     }
 
-    //????? owner is the address of this contract,  
-    //????? msg.sender is the address of the user calling the function within this contract
-    //?? if u understand the implications of the above 2 lines, please fix wherever is appropriate
-
-    //?? this is unnecessary
-    function getAddressOfOwner( string memory owner ) public view
-        returns (address) {
-        return users[owner].userAddress;
-    }
-
-    function addNFT(string memory label, string memory owner, uint256 price) public {
-        require(price >= 0, "price more than 0");
-        require( getAddressOfOwner(owner) != address(0), "invalid user" ); // check for valid account
+    function addNFT(string memory label, string memory username, uint256 price) public {
+        require(price >= 0, "price more than 0"); //price is what unit? ether?
+        require(keccak256(abi.encodePacked((users[msg.sender]))) == keccak256(abi.encodePacked((username))), "not valid account"); //need this?
         //require (address(owner) != msg.sender);
         // what params is pass in? check client
         // the data is store in this contract, how is the data store?
         // what are the checks?
         // create new NFT
+
+        _tokenIds.increment();
+        uint256 newItemId = _tokenIds.current();
+        _mint(msg.sender, newItemId);
+        _setTokenURI(newItemId, label);
+        
         NFT memory newNFT = NFT(
-            label, owner, price
+            label, msg.sender, price
         );
         
-        uint256 item_id = _NFT.mintNFT(getAddressOfOwner( owner ), label); // error here in remix
-        items[item_id] = newNFT;
-        numOfNfts = item_id + 1;
-
-
+        items[newItemId] = newNFT;
+        //add to the itemsbyaddress
+        
 
         // To push to blockchain, finish the above and we can proceed with this next
     }
+
+    function buyNFT( uint256 id ) public payable  {
+        require( msg.sender != items[id].currentOwner); //buyer and seller not the same person
+        require( msg.sender != address(0));
+        require( items[id].currentOwner != address(0));
+        require( msg.value >= items[id].price );
+
+        address payable currentOwner = payable(items[id].currentOwner);
+        currentOwner.transfer(msg.value);
+        //transfer the nft ownership
+        transferFrom( items[id].currentOwner, msg.sender, id );
+        
+        items[id].currentOwner = msg.sender;
+        //remove id from itemsbyaddress
+    }
+    
 }
