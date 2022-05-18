@@ -11,7 +11,11 @@ contract MarketPlace is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    constructor() ERC721("TheNFT", "NFT") {}
+    address public owner;
+
+    constructor() ERC721("TheNFT", "NFT") {
+        owner = msg.sender;
+    }
     
     // Variables
     //address payable public immutable feeAccount; // the account that receives fees
@@ -26,10 +30,11 @@ contract MarketPlace is ERC721URIStorage {
 
     // itemId -> Item
     mapping(uint256 => NFT) private items;
-    mapping(address => string) private users; //address to username, need this?
-    uint256[] items_listed;
     
-    //address -> list of id for the NFTs owned by this address? 
+    mapping(address => string) private users; // why do u need to store the list of user? don't think of traditional user accounts
+    uint256[] items_listed; 
+
+    //address -> list of id for the NFTs owned by this address? WELL DONE
     mapping(address => uint256[] ) private itemsbyaddress;
 
     function registerAccount( string memory username ) public {
@@ -45,13 +50,9 @@ contract MarketPlace is ERC721URIStorage {
     }
 
     function addNFT(string memory label, string memory username, uint256 price) public {
-        require(price >= 0, "price less than 0"); //price is what unit? ether? can this price be 0? if 0 means not listed?
-        require(keccak256(abi.encodePacked((users[msg.sender]))) == keccak256(abi.encodePacked((username))), "not valid account"); //need this?
-        //require (address(owner) != msg.sender);
-        // what params is pass in? check client
-        // the data is store in this contract, how is the data store?
-        // what are the checks?
-        // create new NFT
+        require(price >= 0, "price less than 0"); //user can add nft without price, but to list it, price must be stated
+        require(keccak256(abi.encodePacked((users[msg.sender]))) == keccak256(abi.encodePacked((username))), "not valid account"); //check above comment, we dont need acc system or create a user registration
+        //require (address(owner) != msg.sender); if we dont need this, remove
 
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
@@ -71,8 +72,8 @@ contract MarketPlace is ERC721URIStorage {
     }
 
     function buyNFT( uint256 id ) public payable  {
-        require( msg.sender != items[id].currentOwner); //buyer and seller not the same person
-        require( msg.sender != address(0));
+        require( msg.sender != items[id].currentOwner); //buyer and seller not the same person, if i'm not mistaken, opensea allows user to buy their own nft, i leave it to u
+        require( msg.sender != address(0)); // u are checking for contract address? check constructor above
         require( items[id].currentOwner != address(0));
         require( msg.value >= items[id].price );
 
@@ -88,7 +89,7 @@ contract MarketPlace is ERC721URIStorage {
     //To list the NFT on the marketplace
     function listNFT(uint256 id) public payable {
         //Make sure only owner of NFT can do this
-        require(msg.sender == items[id].currentOwner);
+        require(msg.sender == items[id].currentOwner);  // use a modifier if u are using the same checks throughout the codebase
         require(items[id].price > 0);
         require(msg.value == 0);
         items[id].isListed = true;
@@ -100,5 +101,14 @@ contract MarketPlace is ERC721URIStorage {
         require(items[id].isListed == true, "Item is not listed");
         require(msg.value == 0);
         items[id].isListed = false;
+    }
+
+    // return entire nft list
+    function getNFTList() {
+
+    }
+
+    function getUserNFTList() {
+
     }
 }
