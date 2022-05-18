@@ -12,6 +12,7 @@ contract MarketPlace is ERC721URIStorage {
     Counters.Counter private _tokenIds;
 
     address public owner;
+    uint256 totalNFTs;
 
     constructor() ERC721("TheNFT", "NFT") {
         owner = msg.sender;
@@ -25,39 +26,22 @@ contract MarketPlace is ERC721URIStorage {
         uint256 price;
         bool isListed;
     }
-    event account_created(string username);
-    event account_existed(string username);
 
     // itemId -> Item
     mapping(uint256 => NFT) private items;
-    
-    mapping(address => string) private users; // why do u need to store the list of user? don't think of traditional user accounts
+ 
     uint256[] items_listed; 
 
     //address -> list of id for the NFTs owned by this address? WELL DONE
     mapping(address => uint256[] ) private itemsbyaddress;
 
-    function registerAccount( string memory username ) public {
-        require( msg.sender != address(0) );
-        if ( bytes(users[msg.sender]).length == 0 ) //username is empty = account not created
-        {
-            users[msg.sender] = username;
-            emit account_created(username);
-        }
-        else{
-            emit account_existed(username);
-        }
-    }
-
-    function addNFT(string memory label, string memory username, uint256 price) public {
-        require(price >= 0, "price less than 0"); //user can add nft without price, but to list it, price must be stated
-        require(keccak256(abi.encodePacked((users[msg.sender]))) == keccak256(abi.encodePacked((username))), "not valid account"); //check above comment, we dont need acc system or create a user registration
-        //require (address(owner) != msg.sender); if we dont need this, remove
+    function addNFT(string memory label, uint256 price) public {
 
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
-        _mint(msg.sender, newItemId);
+        _mint(owner, newItemId);
         _setTokenURI(newItemId, label);
+        
         
         NFT memory newNFT = NFT(
             label, msg.sender, price, false
@@ -66,33 +50,55 @@ contract MarketPlace is ERC721URIStorage {
         items[newItemId] = newNFT;
         //add to the itemsbyaddress
         itemsbyaddress[msg.sender].push(newItemId);
-        
+        totalNFTs++;
 
         // To push to blockchain, finish the above and we can proceed with this next
     }
 
+    function removeFromList( uint256 id, address user ) private {
+        uint256[] storage itemslist = itemsbyaddress[user];
+        for ( uint256 i = 0; i < itemslist.length; i++ ){
+            if ( itemslist[i] == id ) {
+                if ( itemslist.length > 1 ) {
+                    itemslist[i] = itemslist[itemslist.length-1]; //replace with last item in the least?
+                }
+                itemslist.pop();              
+                break;
+            }
+        }
+        itemsbyaddress[user] = itemslist;
+    }
+
     function buyNFT( uint256 id ) public payable  {
-        require( msg.sender != items[id].currentOwner); //buyer and seller not the same person, if i'm not mistaken, opensea allows user to buy their own nft, i leave it to u
-        require( msg.sender != address(0)); // u are checking for contract address? check constructor above
+        //require( msg.sender != items[id].currentOwner); //buyer and seller not the same person, if i'm not mistaken, opensea allows user to buy their own nft, i leave it to u
+        //require( msg.sender != address(0)); // u are checking for contract address? check constructor above
         require( items[id].currentOwner != address(0));
         require( msg.value >= items[id].price );
 
-        address payable currentOwner = payable(items[id].currentOwner);
-        currentOwner.transfer(msg.value);
-        //transfer the nft ownership
-        transferFrom( items[id].currentOwner, msg.sender, id );
         
-        items[id].currentOwner = msg.sender;
+        address payable sendTo = payable(items[id].currentOwner);
+        // send token's worth of ethers to the owner
+        sendTo.transfer(msg.value);
+        
+        _transfer( sendTo, msg.sender, id ); //xfer ownership
+        
         //remove id from itemsbyaddress
+        removeFromList(id, items[id].currentOwner);
+
+        items[id].currentOwner = msg.sender;//update to new owner of the nft
+        itemsbyaddress[msg.sender].push( id );
     }
     
+    
+
     //To list the NFT on the marketplace
-    function listNFT(uint256 id) public payable {
+    function listNFT(uint256 id, uint256 price) public payable {
         //Make sure only owner of NFT can do this
         require(msg.sender == items[id].currentOwner);  // use a modifier if u are using the same checks throughout the codebase
-        require(items[id].price > 0);
         require(msg.value == 0);
+        require(price >= 0);
         items[id].isListed = true;
+        items[id].price = price;
     }
 
     function delistNFT(uint256 id)public payable{
@@ -104,11 +110,20 @@ contract MarketPlace is ERC721URIStorage {
     }
 
     // return entire nft list
-    function getNFTList() {
+    function getNFTList() public view returns (uint256[] memory, NFT[] memory) {
+        uint256[] memory ids = new uint256[](_tokenIds.current()+1);
+        NFT[] memory nfts = new NFT[](_tokenIds.current()+1);
 
+        for ( uint256 i=1; i < _tokenIds.current()+1; i++ )
+        {
+            NFT storage nft = items[i];
+            ids[i] = i;
+            nfts[i] = nft;
+        }
+        return ( ids, nfts );
     }
 
-    function getUserNFTList() {
-
+    function getUserNFTList() public view returns (uint256[] memory) {
+        return itemsbyaddress[msg.sender];
     }
 }
