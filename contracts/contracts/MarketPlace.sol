@@ -3,64 +3,55 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-
-contract MarketPlace is ERC721URIStorage {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
+contract MarketPlace {
 
     address public owner;
     uint256 totalNFTs;
 
-    constructor() ERC721("TheNFT", "NFT") {
+    constructor() {
         owner = msg.sender;
     }
     
     // Variables
     //address payable public immutable feeAccount; // the account that receives fees
     struct NFT{
+        uint256 id;
         string label;
         address currentOwner;
         uint256 price;
         bool isListed;
     }
 
-    // itemId -> Item
     mapping(uint256 => NFT) private items;
+    mapping(address => NFT[] ) private itemsbyaddress;
  
     uint256[] items_listed; 
 
-    //address -> list of id for the NFTs owned by this address? WELL DONE
-    mapping(address => uint256[] ) private itemsbyaddress;
-
-    function addNFT(string memory label, uint256 price) public {
-
-        _tokenIds.increment();
-        uint256 newItemId = _tokenIds.current();
-        _mint(owner, newItemId);
-        _setTokenURI(newItemId, label);
-        
+    function addNFT(string memory label, uint256 price) public notContractOwner {
+        totalNFTs++;
+        uint256 newItemId = totalNFTs;
+        //_mint(owner, newItemId);
+        //_setTokenURI(newItemId, label);
+        //create token here?
         
         NFT memory newNFT = NFT(
-            label, msg.sender, price, false
+            totalNFTs, label, msg.sender, price, false
         );
         
         items[newItemId] = newNFT;
         //add to the itemsbyaddress
-        itemsbyaddress[msg.sender].push(newItemId);
-        totalNFTs++;
+        itemsbyaddress[msg.sender].push(newNFT);
+       
 
-        // To push to blockchain, finish the above and we can proceed with this next
     }
 
     function removeFromList( uint256 id, address user ) private {
-        uint256[] storage itemslist = itemsbyaddress[user];
+        NFT[] storage itemslist = itemsbyaddress[user];
         for ( uint256 i = 0; i < itemslist.length; i++ ){
-            if ( itemslist[i] == id ) {
+            if ( itemslist[i].id == id ) {
                 if ( itemslist.length > 1 ) {
-                    itemslist[i] = itemslist[itemslist.length-1]; //replace with last item in the least?
+                    itemslist[i] = itemslist[itemslist.length-1]; //replace with last item in the list? hmm 
+                    //didnt want to have gap between them, any other idea how to do it? delete itemslist[i]?
                 }
                 itemslist.pop();              
                 break;
@@ -69,10 +60,8 @@ contract MarketPlace is ERC721URIStorage {
         itemsbyaddress[user] = itemslist;
     }
 
-    function buyNFT( uint256 id ) public payable  {
+    function buyNFT( uint256 id ) public payable notContractOwner {
         //require( msg.sender != items[id].currentOwner); //buyer and seller not the same person, if i'm not mistaken, opensea allows user to buy their own nft, i leave it to u
-        //require( msg.sender != address(0)); // u are checking for contract address? check constructor above
-        require( items[id].currentOwner != address(0));
         require( msg.value >= items[id].price );
 
         
@@ -80,50 +69,61 @@ contract MarketPlace is ERC721URIStorage {
         // send token's worth of ethers to the owner
         sendTo.transfer(msg.value);
         
-        _transfer( sendTo, msg.sender, id ); //xfer ownership
+        //_transfer( sendTo, msg.sender, id ); //xfer token ownership
         
         //remove id from itemsbyaddress
         removeFromList(id, items[id].currentOwner);
 
         items[id].currentOwner = msg.sender;//update to new owner of the nft
-        itemsbyaddress[msg.sender].push( id );
+        itemsbyaddress[msg.sender].push( items[id] );
     }
     
-    
-
     //To list the NFT on the marketplace
-    function listNFT(uint256 id, uint256 price) public payable {
-        //Make sure only owner of NFT can do this
-        require(msg.sender == items[id].currentOwner);  // use a modifier if u are using the same checks throughout the codebase
-        require(msg.value == 0);
+    // listing nft does perform any transactions
+    function listNFT(uint256 id, uint256 price) public onlyNFTOwner(id) {
+        //require(msg.value == 0);
         require(price >= 0);
         items[id].isListed = true;
         items[id].price = price;
     }
 
-    function delistNFT(uint256 id)public payable{
-        //Make sure only owner of NFT can do this
-        require(msg.sender == items[id].currentOwner);
-        require(items[id].isListed == true, "Item is not listed");
-        require(msg.value == 0);
+    // delisting does not require any transactions to take place
+    function delistNFT(uint256 id)public onlyNFTOwner(id) {
+        //require(items[id].isListed == true, "Item is not listed"); //not required
+        //require(msg.value == 0);
         items[id].isListed = false;
     }
 
-    // return entire nft list
-    function getNFTList() public view returns (uint256[] memory, NFT[] memory) {
-        uint256[] memory ids = new uint256[](_tokenIds.current()+1);
-        NFT[] memory nfts = new NFT[](_tokenIds.current()+1);
-
-        for ( uint256 i=1; i < _tokenIds.current()+1; i++ )
+    // return entire nft list, forget to mention listed nfts only
+    function getNFTList() public view returns ( NFT[] memory ) {
+        // instead of doing all these work to process the data, it's better to just store the id in the struct on creation
+        // how to return mapping without using for loop?
+        NFT[] memory nfts = new NFT[](totalNFTs+1);
+        uint count; 
+        for ( uint i=0; i < totalNFTs+1; i++)
         {
             NFT storage nft = items[i];
-            ids[i] = i;
-            nfts[i] = nft;
+            if ( nft.isListed )
+                nfts[count] = nft;
+                count++;
         }
-        return ( ids, nfts );
+
+        return (nfts);
     }
 
-    function getUserNFTList() public view returns (uint256[] memory) {
+    function getUserNFTList() public view returns (NFT[] memory) {
+        // return the actual nft data not the id
         return itemsbyaddress[msg.sender];
+    }
+
+    modifier notContractOwner() {
+        require(msg.sender != owner);
+        _;
+    }
+
+    modifier onlyNFTOwner(uint256 id) {
+        //Make sure only owner of NFT can do this
+        require(msg.sender == items[id].currentOwner);
+        _;
     }
 }

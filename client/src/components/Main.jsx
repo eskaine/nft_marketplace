@@ -1,19 +1,22 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import NFTDisplay from './shared/NFTDisplay';
+import { EthersContext } from '../utils/EthersProvider';
 
 function Main() {
+  const { getNFTList } = useContext(EthersContext);
+
   return (
-    <main className="container mx-auto mt-10">
-      <div>NFT List</div>
+    <main className="content mt-10">
+      <div className="content-title">NFT List</div>
       <div className="flex justify-center flex-wrap">
-        <NFTDisplay label="Sample" owner="Nobody" price="500" />
-        <NFTDisplay label="Sample" owner="Nobody" price="500" />
-        <NFTDisplay label="Sample" owner="Nobody" price="500" />
-        <NFTDisplay label="Sample" owner="Nobody" price="500" />
-        <NFTDisplay label="Sample" owner="Nobody" price="500" />
-        <NFTDisplay label="Sample" owner="Nobody" price="500" />
-        <NFTDisplay label="Sample" owner="Nobody" price="500" />
-        <NFTDisplay label="Sample" owner="Nobody" price="500" />
+        {getNFTList().map((nft) => (
+          <NFTDisplay
+            label={nft.label}
+            imageUrl={nft.imageUrl}
+            owner={nft.owner}
+            price={nft.price}
+          />
+        ))}
       </div>
     </main>
   );
