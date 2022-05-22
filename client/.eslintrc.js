@@ -20,7 +20,8 @@ module.exports = {
   rules: {
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "react/button-has-type": 0,
-    "react/require-default-props": 0
+    "react/require-default-props": 0,
+    "linebreak-style": ["error", "windows"] 
   },
   overrides: [
     {

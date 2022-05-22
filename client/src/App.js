@@ -3,7 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Main from './components/Main';
 import Footer from './components/Footer';
-
+import NFTDetail from './components/pages/NFTDetail';
+import CreateNFT from './components/pages/CreateNFT';
 import './index.css';
 import './styles/base.css';
 
@@ -14,9 +15,9 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Main />} />
-          {/* <Route path="about" element={<About />} /> */}
+          <Route path="nftdetail" element={<NFTDetail />} />
+          <Route path="createnft" element={<CreateNFT />} />
         </Routes>
-
         <Footer />
       </div>
     </div>
