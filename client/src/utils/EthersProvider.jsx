@@ -2,8 +2,8 @@ import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { ethers } from 'ethers';
 import contractABI from './MarketPlace.json';
+import ipfsClient from './ipfsClient';
 import data from '../seedData';
-
 
 const EthersContext = React.createContext();
 
@@ -38,7 +38,23 @@ function EthersProvider({ children }) {
     }
   }
 
-  function addNFT(nftObj) {
+  function writeImage(imageFile) {
+    try {
+      if(ipfsClient) {
+        const reader = new window.FileReader();
+        reader.readAsArrayBuffer(imageFile);
+        reader.onloadend = () => {
+          const buffer = Buffer(reader.result);
+          return ipfsClient.add(buffer);
+        }
+      }
+    } catch (error) {
+      console.error('File reading error');
+    }
+  }
+
+  async function addNFT(nftObj) {
+    const ipfsUrl = await writeImage(nftObj.image);
     addNFTToList([...nftList, nftObj]);
   }
 
