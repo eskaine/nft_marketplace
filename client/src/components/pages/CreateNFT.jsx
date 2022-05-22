@@ -1,7 +1,9 @@
 import { ethers } from 'ethers';
-import React from 'react';
+import React, { useState } from 'react';
+import { EthersContext } from '../../utils/EthersProvider';
 
 function CreateNFT() {
+  const { getNFTList } = useContext(EthersContext);
   const [fileUrl, setFileUrl] = useState(null);
   const [formInput, updateFormInput] = useState({ price: '', name: '', description: '' });
   const router = useRouter();
