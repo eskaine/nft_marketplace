@@ -1,11 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { ethers } from 'ethers';
+import contractABI from './MarketPlace.json';
 import data from '../seedData';
+
 
 const EthersContext = React.createContext();
 
 function EthersProvider({ children }) {
+  const [contractAddress] = useState('');
   const [state, setState] = useState({});
   // temp nft state
   const [nftList, addNFTToList] = useState(data);
@@ -19,6 +22,19 @@ function EthersProvider({ children }) {
       });
     } else {
       // alert install metamask
+    }
+  }
+
+  function getContract() {
+    if (typeof window.ethereum !== 'undefined') {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      return new ethers.Contract(
+        contractAddress,
+        contractABI.abi,
+        signer
+      );
     }
   }
 
