@@ -106,7 +106,7 @@ contract MarketPlace {
     function getUserNFTList(address user) public view returns (NFT[] memory) {
         // return the actual nft data not the id
         uint256[] memory useritems = itemsbyaddress[user];
-        NFT[] memory nfts;// = new NFT[](totalNFTs+1);
+        NFT[] memory nfts = new NFT[](useritems.length+1);
         
         for ( uint i=0; i < useritems.length; i++)
         {
