@@ -38,23 +38,8 @@ function EthersProvider({ children }) {
     }
   }
 
-  function writeImage(imageFile) {
-    try {
-      if(ipfsClient) {
-        const reader = new window.FileReader();
-        reader.readAsArrayBuffer(imageFile);
-        reader.onloadend = () => {
-          const buffer = Buffer(reader.result);
-          return ipfsClient.add(buffer);
-        }
-      }
-    } catch (error) {
-      console.error('File reading error');
-    }
-  }
-
   async function addNFT(nftObj) {
-    const ipfsUrl = await writeImage(nftObj.image);
+    const imageUrl = await ipfsClient.add(nftObj.image);
     addNFTToList([...nftList, nftObj]);
   }
 

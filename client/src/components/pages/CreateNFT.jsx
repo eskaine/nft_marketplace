@@ -1,63 +1,79 @@
 import { ethers } from 'ethers';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { EthersContext } from '../../utils/EthersProvider';
+import { Buffer } from 'buffer';
+
 
 function CreateNFT() {
-  const { getNFTList } = useContext(EthersContext);
-  const [fileUrl, setFileUrl] = useState(null);
+  const { addNFT, getNFTList } = useContext(EthersContext);
+  const [imageFile, setImageFile] = useState(null);
   const [formInput, updateFormInput] = useState({ price: '', name: '', description: '' });
-  const router = useRouter();
-  async function onChange(e) {
-    const file = e.target.files[0];
+  // const router = useRouter();
+
+  async function onChange(event) {
     try {
-      const added = await client.add(
-        file,
-        {
-          progress: (prog) => console.log(`received: ${prog}`),
-        },
-      );
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-      setFileUrl(url);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  async function createItem() {
-    const { name, description, price } = formInput;
-    if (!name || !description || !price || !fileUrl) return;
-    const data = JSON.stringify({
-      name, description, image: fileUrl,
-    });
-    try {
-      const added = await client.add(data);
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-      createSale(url);
+      const reader = new window.FileReader();
+      reader.readAsArrayBuffer(event.target.files[0]);
+      reader.onloadend = () => {
+        const buffer = Buffer(reader.result);
+        setImageFile(buffer);
+      }
     } catch (error) {
-      console.log('ERROR uploading file', error);
+      console.error('Error reading file');
     }
   }
 
-  async function createSales() {
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(nftaddress, NFT.abi, signer);
-    const transaction = await contract.createToken(url);
-    const tax = await transaction.wait();
-    const event = tx.events[0];
-    const value = event.args[2];
-    const tokenId = value.toNumber();
-    const price = ethers.utils.parseUnits(formInput.price, 'ether');
-    contract = new ethers.Contract(nftmarketaddress, Market.abi, signer);
-    const listingPrice = await contract.getListingPrice();
-    transaction = await contract.createMarketItem(nftaddress, tokenId, price, {
-      value:
-	listingPrice,
-    });
-    await transaction.wait();
-    router.push('/');
-  }
+  // async function onChange(e) {
+  //   const file = e.target.files[0];
+  //   try {
+  //     const added = await client.add(
+  //       file,
+  //       {
+  //         progress: (prog) => console.log(`received: ${prog}`),
+  //       },
+  //     );
+  //     const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+  //     setFileUrl(url);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
+  // async function createItem() {
+  //   const { name, description, price } = formInput;
+  //   if (!name || !description || !price || !fileUrl) return;
+  //   const data = JSON.stringify({
+  //     name, description, image: fileUrl,
+  //   });
+  //   try {
+  //     const added = await client.add(data);
+  //     const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+  //     createSale(url);
+  //   } catch (error) {
+  //     console.log('ERROR uploading file', error);
+  //   }
+  // }
+
+  // async function createSales() {
+  //   const web3Modal = new Web3Modal();
+  //   const connection = await web3Modal.connect();
+  //   const provider = new ethers.providers.Web3Provider(connection);
+  //   const signer = provider.getSigner();
+  //   const contract = new ethers.Contract(nftaddress, NFT.abi, signer);
+  //   const transaction = await contract.createToken(url);
+  //   const tax = await transaction.wait();
+  //   const event = tx.events[0];
+  //   const value = event.args[2];
+  //   const tokenId = value.toNumber();
+  //   const price = ethers.utils.parseUnits(formInput.price, 'ether');
+  //   contract = new ethers.Contract(nftmarketaddress, Market.abi, signer);
+  //   const listingPrice = await contract.getListingPrice();
+  //   transaction = await contract.createMarketItem(nftaddress, tokenId, price, {
+  //     value:
+	// listingPrice,
+  //   });
+  //   await transaction.wait();
+  //   router.push('/');
+  // }
 
   return (
     <main className="container mx-auto mt-10">
@@ -83,7 +99,7 @@ function CreateNFT() {
         onChange={onChange}
       />
       <button
-        onClick={createMarketItem}
+        // onClick={createMarketItem}
         className="font-bold mt-4 bg-pink-500 text-white rounded p-4 shadow-lg"
       >
         Create Digital
