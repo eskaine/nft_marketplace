@@ -1,9 +1,11 @@
 
 node_modules
 .env
+.gitignore
 coverage
 coverage.json
 typechain
+.DS_Store
 
 #Hardhat files
 cache
