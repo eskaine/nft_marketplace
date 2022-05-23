@@ -16,7 +16,7 @@ contract MarketPlace {
         string name;
         address currentOwner;
         uint256 price;
-        string tokenurl;
+        string imageUrl;
         bool isListed;
     }
 
@@ -25,12 +25,14 @@ contract MarketPlace {
  
     uint256[] items_listed; 
 
-    function addNFT(uint256 price, string memory name, string memory tokenUrl) public notContractOwner {
+    function addNFT(string memory name, uint256 price, string memory imageUrl, bool isListed) public notContractOwner {
         totalNFTs++;
         uint256 newItemId = totalNFTs;
+
+        // add checks for isListed
         
         NFT memory newNFT = NFT(
-            newItemId, name, msg.sender, price, tokenUrl, false
+            newItemId, name, msg.sender, price, imageUrl, isListed
         );
         
         items[newItemId] = newNFT;
@@ -38,7 +40,7 @@ contract MarketPlace {
     }
 
     function removeFromList( uint256 id, address user ) private onlyNFTOwner(id) {
-        delete itemsbyaddress[user][id]; //joyce and zach: remove from list
+        delete itemsbyaddress[user][id];
     }
 
     // function buyNFT( uint256 id ) public payable notContractOwner {
@@ -55,15 +57,17 @@ contract MarketPlace {
     //     items[id].currentOwner = msg.sender;
     //     itemsbyaddress[msg.sender].push( id );
     // }
-    
-    function listNFT(uint256 id, uint256 price) public onlyNFTOwner(id) {
-        require(price >= 0);
-        items[id].isListed = true;
-        items[id].price = price;
-    }
 
-    function delistNFT(uint256 id)public onlyNFTOwner(id) {
+    function editNFT(uint256 id, string memory name, uint256 price, string memory imageUrl, bool isListed) public onlyNFTOwner(id) {
+        items[id].name = name;
+        items[id].price = price;
+        items[id].imageUrl = imageUrl;
         items[id].isListed = false;
+
+        if(isListed) {
+            require(price >= 0);
+            items[id].isListed = true;
+        }
     }
 
     function getUserNFTList(address user) public view returns (NFT[] memory) {
