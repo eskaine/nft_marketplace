@@ -73,7 +73,19 @@ function EthersProvider({ children }) {
 
   function getNFTList() {
     const contract = getContract();
-    return contract.items.filter((item) => item.isListed);
+    const nfts = [];
+
+    if (contract.items) {
+      for (const i in contract.items) {
+        const item = contract.items[i];
+
+        if (item.isListed) {
+          nfts.push(item);
+        }
+      }
+    }
+
+    return items;
   }
 
   const memoizedState = useMemo(() => ({
