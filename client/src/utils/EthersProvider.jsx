@@ -85,7 +85,7 @@ function EthersProvider({ children }) {
       }
     }
 
-    return items;
+    return nfts;
   }
 
   const memoizedState = useMemo(() => ({
