@@ -1,54 +1,95 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { ethers } from 'ethers';
-import contractABI from './MarketPlace.json';
+import contractAbi from './MarketPlace.json';
 import ipfsClient from './ipfsClient';
-import data from '../seedData';
 
 const EthersContext = React.createContext();
 
 function EthersProvider({ children }) {
-  const [contractAddress] = useState('');
-  const [state, setState] = useState({});
-  // temp nft state
-  const [nftList, addNFTToList] = useState(data);
+  const [contractAddress] = useState('0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0');
+  const [userAccount, setUserAccount] = useState(null);
 
-  async function setAccount() {
-    if (typeof window.ethereum !== 'undefined') {
-      const userAccount = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      setState({
-        userAccount, provider, ...state,
-      });
-    } else {
-      // alert install metamask
+  async function connectWallet() {
+    try {
+      if (window.ethereum) {
+        const user = await window.ethereum.request(
+          { method: 'eth_requestAccounts' },
+        );
+
+        setUserAccount(user);
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
   function getContract() {
-    if (typeof window.ethereum !== 'undefined') {
+    if (window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
 
       return new ethers.Contract(
         contractAddress,
-        contractABI.abi,
-        signer
+        contractAbi.abi,
+        signer,
       );
     }
   }
 
-  async function addNFT(nftObj) {
-    const imageUrl = await ipfsClient.add(nftObj.image);
-    addNFTToList([...nftList, nftObj]);
+  async function addNFT({
+    name, price, isListed, image,
+  }) {
+    const newNFT = {
+      name, price, isListed, imageUrl: '',
+    };
+
+    if (image) {
+      const imageUrl = await ipfsClient.add(image);
+      newNFT.imageUrl = imageUrl;
+    }
+
+    const contract = getContract();
+    contract.addNFT(...newNFT);
+  }
+
+  async function editNFT({
+    id, name, price, isListed, currentImageUrl, image,
+  }) {
+    const NFT = {
+      id, name, price, isListed, imageUrl: '',
+    };
+
+    if (currentImageUrl == '') {
+      const imageUrl = await ipfsClient.add(image);
+      NFT.imageUrl = imageUrl;
+    } else {
+      NFT.imageUrl = currentImageUrl;
+    }
+
+    const contract = getContract();
+    contract.editNFT(...NFT);
   }
 
   function getNFTList() {
-    return nftList;
+    const contract = getContract();
+    const nfts = [];
+
+    if (contract.items) {
+      for (const i in contract.items) {
+        const item = contract.items[i];
+
+        if (item.isListed) {
+          nfts.push(item);
+        }
+      }
+    }
+
+    return nfts;
   }
 
   const memoizedState = useMemo(() => ({
-    addNFT, getNFTList, setAccount, ...state,
+    addNFT, editNFT, getNFTList, connectWallet, userAccount,
   }));
 
   return (

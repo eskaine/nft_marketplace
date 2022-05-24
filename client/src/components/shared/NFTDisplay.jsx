@@ -16,7 +16,8 @@ function NFTDisplay({
           {owner}
         </div>
         <div className="py-3">
-          <p className="text-sm text-gray-400">Buy Now</p>
+          <p className="text-sm text-gray-400" >
+		  <Link to="/nftdetail">Buy</Link></p>
           <p>
             {price}
             &nbsp;
