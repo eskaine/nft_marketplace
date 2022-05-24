@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
 import { EthersContext } from '../../utils/EthersProvider';
 
 function NFTDetail() {
@@ -50,10 +49,6 @@ function NFTDetail() {
                 <h6>{nft.owner}</h6>
               </div>
             </div>
-            <button className="singleNft-btn d-flex align-items-center gap-2 w-100">
-              <i className="ri-shopping-bag-line" />
-              <Link to="/wallet">Buy Now</Link>
-            </button>
           </div>
         </div>
       ))}
