@@ -6,6 +6,7 @@ import { EthersContext } from '../utils/EthersProvider';
 function Navbar() {
   const { connectWallet, userAccount } = useContext(EthersContext);
   const navigate = useNavigate();
+
   return (
     <div className="my-5 flex justify-between">
       <span className="font-bold text-white"><a href="/">NFT MARKETPLACE</a></span>
