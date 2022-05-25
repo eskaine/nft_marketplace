@@ -10,3 +10,6 @@ typechain
 #Hardhat files
 cache
 artifacts
+.vs/slnx.sqlite
+.vs/VSWorkspaceState.json
+.vs/nft_marketplace/v16/.suo

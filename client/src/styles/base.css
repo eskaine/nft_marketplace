@@ -12,3 +12,7 @@
     font-size: 25px;
     font-weight: bold;
 }
+
+input, select, textarea{
+    color: black;
+}

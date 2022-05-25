@@ -4,6 +4,8 @@ import Navbar from './components/Navbar';
 import Main from './components/Main';
 import UserHome from './components/pages/UserHome';
 import Footer from './components/Footer';
+import NFTDetail from './components/pages/NFTDetail';
+import CreateNFT from './components/pages/CreateNFT';
 import { EthersContext } from './utils/EthersProvider';
 
 import './index.css';
@@ -18,6 +20,8 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Main />} />
+          <Route path="nftdetail" element={<NFTDetail />} />
+          <Route path="createnft" element={<CreateNFT />} />
           <Route path="user" element={userAccount ? <Navigate to="/" /> : <UserHome header="My NFT List" />} />
         </Routes>
         <Footer />
