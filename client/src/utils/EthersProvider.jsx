@@ -7,7 +7,7 @@ import ipfsClient from './ipfsClient';
 const EthersContext = React.createContext();
 
 function EthersProvider({ children }) {
-  const [contractAddress] = useState('0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0');
+  const [contractAddress] = useState('0x5FbDB2315678afecb367f032d93F642f64180aa3');
   const [userAccount, setUserAccount] = useState(null);
 
   async function connectWallet() {
@@ -17,7 +17,7 @@ function EthersProvider({ children }) {
           { method: 'eth_requestAccounts' },
         );
 
-        setUserAccount(user);
+        setUserAccount(user[0]);
       }
     } catch (error) {
       console.error(error);
@@ -40,17 +40,21 @@ function EthersProvider({ children }) {
   async function addNFT({
     name, price, isListed, image,
   }) {
-    const newNFT = {
-      name, price, isListed, imageUrl: '',
-    };
+    // const newNFT = {
+    //   name, price, isListed, imageUrl: '',
+    // };
 
-    if (image) {
-      const imageUrl = await ipfsClient.add(image);
-      newNFT.imageUrl = imageUrl;
-    }
+    // if (image) {
+    //   const imgObj = await ipfsClient.add(image, {
+    //     progress: (prog) => console.log(`received: ${prog}`),
+    //   });
+    //   newNFT.imageUrl = `https://ipfs.infura.io/ipfs/${imgObj.path}`;
+    // }
+    console.log('adding');
 
     const contract = getContract();
-    contract.addNFT(...newNFT);
+    console.log('adding2');
+    contract.addNFT(name, price, image, isListed);
   }
 
   async function editNFT({
@@ -60,7 +64,7 @@ function EthersProvider({ children }) {
       id, name, price, isListed, imageUrl: '',
     };
 
-    if (currentImageUrl == '') {
+    if (currentImageUrl === '') {
       const imageUrl = await ipfsClient.add(image);
       NFT.imageUrl = imageUrl;
     } else {

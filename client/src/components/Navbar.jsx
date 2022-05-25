@@ -9,11 +9,11 @@ function Navbar() {
 
   return (
     <div className="my-5 flex justify-between">
-      <span className="font-bold text-white"><a href="/">NFT MARKETPLACE</a></span>
+      <span className="font-bold text-white"><a onClick={() => navigate('/')}>NFT MARKETPLACE</a></span>
       {!userAccount && <Button bgColor="primary-color" name="Login with Metamask" onClick={connectWallet} />}
       {userAccount && (
         <div className="user-nav">
-          <a href="/user">My List</a>
+          <a onClick={() => navigate('/user')}>My List</a>
           <Button bgColor="primary-color" name="Add NFT" onClick={() => navigate('/createnft')} />
         </div>
       )}

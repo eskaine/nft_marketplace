@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import {Buffer} from 'buffer';
 import { EthersContext } from '../../utils/EthersProvider';
 import NFTDisplay from '../shared/NFTDisplay';
 import Button from '../shared/Button';
@@ -8,10 +9,16 @@ import ipfsClient from '../../utils/ipfsClient';
 function CreateNFT() {
   const { getNFTList, addNFT } = useContext(EthersContext);
   const [fileUrl, setFileUrl] = useState(null);
-  const [formInput, updateFormInput] = useState({ price: '', title: '' });
+  const [formInput, updateFormInput] = useState({ price: '', name: '' });
 
   async function onChange(e) {
     const file = e.target.files[0];
+    // const reader = new window.FileReader();
+    // reader.readAsArrayBuffer(file);
+    // reader.onloadend = () => {
+    //   const buffer = Buffer(reader.result);
+    //   setFileUrl(buffer);
+    // }
     try {
       const added = await ipfsClient.add(
         file,
@@ -21,6 +28,7 @@ function CreateNFT() {
         },
       );
       const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+      console.log({url});
       setFileUrl(url);
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -29,14 +37,10 @@ function CreateNFT() {
   }
 
   async function createNft() {
-    const { title, price } = formInput;
-    if (!title || !price || !fileUrl) return;
-    /* first, upload to IPFS */
-    const data = JSON.stringify({
-      title, image: fileUrl,
-    });
+  
+    const {price, name} = formInput;
     try {
-      addNFT(title, price, true, data);
+      addNFT(name, price, true, fileUrl);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log('Error uploading file: ', error);
@@ -100,7 +104,7 @@ function CreateNFT() {
                 To be Listed
               </label>
             </div> */}
-          <Button bgColor="primary-color" name="Add NFT" onClick={() => createNft} />
+          <Button bgColor="primary-color" name="Add NFT" onClick={() => createNft()} />
         </div>
       </section>
     </main>

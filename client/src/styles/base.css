@@ -16,3 +16,7 @@
 input, select, textarea{
     color: black;
 }
+
+a {
+    cursor: pointer;
+}

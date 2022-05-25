@@ -34,9 +34,13 @@ contract MarketPlace {
         NFT memory newNFT = NFT(
             newItemId, name, msg.sender, price, imageUrl, isListed
         );
+
         
         items[newItemId] = newNFT;
+
         itemsbyaddress[msg.sender].push(newItemId);
+
+
     }
 
     function removeFromList( uint256 id, address user ) private onlyNFTOwner(id) {
@@ -57,6 +61,8 @@ contract MarketPlace {
     //     items[id].currentOwner = msg.sender;
     //     itemsbyaddress[msg.sender].push( id );
     // }
+
+    //https://ipfs.infura.io/ipfs/Qmf6isejKuRVLxWyY1NpMudrGp97xo5NCtamynbKrssjBi
 
     function editNFT(uint256 id, string memory name, uint256 price, string memory imageUrl, bool isListed) public onlyNFTOwner(id) {
         items[id].name = name;

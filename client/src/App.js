@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { useContext, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Main from './components/Main';
 import UserHome from './components/pages/UserHome';
@@ -13,6 +13,13 @@ import './styles/base.css';
 
 function App() {
   const { userAccount } = useContext(EthersContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userAccount) {
+      return navigate('/');
+    }
+  }, [userAccount]);
 
   return (
     <div className="App">
@@ -22,7 +29,7 @@ function App() {
           <Route path="/" element={<Main />} />
           <Route path="nftdetail" element={<NFTDetail />} />
           <Route path="createnft" element={<CreateNFT />} />
-          <Route path="user" element={userAccount ? <Navigate to="/" /> : <UserHome header="My NFT List" />} />
+          <Route path="user" element={<UserHome header="My NFT List" />} />
         </Routes>
         <Footer />
       </div>
