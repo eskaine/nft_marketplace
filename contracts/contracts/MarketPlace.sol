@@ -11,7 +11,7 @@ contract MarketPlace {
         owner = msg.sender;
     }
     
-    struct NFT{
+    struct nft {
         uint256 id;
         string name;
         address currentOwner;
@@ -20,27 +20,25 @@ contract MarketPlace {
         bool isListed;
     }
 
-    mapping(uint256 => NFT) public items;
+    mapping(uint256 => nft) public items;
     mapping(address => uint256[]) private itemsbyaddress; 
  
     uint256[] items_listed; 
 
-    function addNFT(string memory name, uint256 price, string memory imageUrl, bool isListed) public notContractOwner {
+    function addNFT(string memory name, uint256 price, string memory imageUrl, bool isListed) public payable returns(uint256)  {
+        require(msg.value > 0.01 ether);
+
         totalNFTs++;
         uint256 newItemId = totalNFTs;
-
-        // add checks for isListed
         
-        NFT memory newNFT = NFT(
+        nft memory newNFT = nft(
             newItemId, name, msg.sender, price, imageUrl, isListed
         );
-
         
         items[newItemId] = newNFT;
-
         itemsbyaddress[msg.sender].push(newItemId);
 
-
+        return newItemId;
     }
 
     function removeFromList( uint256 id, address user ) private onlyNFTOwner(id) {
@@ -64,6 +62,7 @@ contract MarketPlace {
 
     //https://ipfs.infura.io/ipfs/Qmf6isejKuRVLxWyY1NpMudrGp97xo5NCtamynbKrssjBi
 
+
     function editNFT(uint256 id, string memory name, uint256 price, string memory imageUrl, bool isListed) public onlyNFTOwner(id) {
         items[id].name = name;
         items[id].price = price;
@@ -76,14 +75,26 @@ contract MarketPlace {
         }
     }
 
-    function getUserNFTList(address user) public view returns (NFT[] memory) {
+    function getAllListedNFT() public view returns (nft[] memory) {
+        nft[] memory nfts = new nft[](totalNFTs);
+        
+        for (uint i = 0; i < totalNFTs; i++)
+        {
+            nft storage item = items[i];
+            nfts[i] = item;
+        }
+
+        return nfts;
+    }
+
+    function getUserNFTList(address user) public view returns (nft[] memory) {
         uint256[] memory useritems = itemsbyaddress[user];
-        NFT[] memory nfts = new NFT[](useritems.length+1);
+        nft[] memory nfts = new nft[](useritems.length+1);
         
         for ( uint i=0; i < useritems.length; i++)
         {
-            NFT storage nft = items[i];
-            nfts[i] = nft;
+            nft storage item = items[i];
+            nfts[i] = item;
         }
         return (nfts);
     }

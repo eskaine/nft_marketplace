@@ -35,4 +35,16 @@ export default [
     currentOwner: 'Haddock',
     price: 30000,
   },
+  {
+    label: 'Helix',
+    imageUrl: 'https://via.placeholder.com/280',
+    currentOwner: 'Magdalene',
+    price: 250,
+  },
+  {
+    label: 'Monolith',
+    imageUrl: 'https://via.placeholder.com/280',
+    currentOwner: 'Dinah',
+    price: 3200,
+  },
 ];

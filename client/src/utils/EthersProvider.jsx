@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { ethers } from 'ethers';
 import contractAbi from './MarketPlace.json';
 import ipfsClient from './ipfsClient';
+import data from './seedData';
 
 const EthersContext = React.createContext();
 
@@ -37,12 +38,7 @@ function EthersProvider({ children }) {
     }
   }
 
-  async function addNFT({
-    name, price, isListed, image,
-  }) {
-    // const newNFT = {
-    //   name, price, isListed, imageUrl: '',
-    // };
+  async function addNFT({name, price, isListed, image}) {
 
     // if (image) {
     //   const imgObj = await ipfsClient.add(image, {
@@ -50,11 +46,15 @@ function EthersProvider({ children }) {
     //   });
     //   newNFT.imageUrl = `https://ipfs.infura.io/ipfs/${imgObj.path}`;
     // }
-    console.log('adding');
 
     const contract = getContract();
-    console.log('adding2');
-    contract.addNFT(name, price, image, isListed);
+    
+    let tx = await contract.addNFT(name, price, image, isListed,  {
+      value: ethers.utils.parseEther("0.1"),
+    });
+    const receipt = await tx.wait();
+    
+    return receipt;
   }
 
   async function editNFT({
@@ -75,21 +75,28 @@ function EthersProvider({ children }) {
     contract.editNFT(...NFT);
   }
 
-  function getNFTList() {
+  async function getNFTList() {
     const contract = getContract();
-    const nfts = [];
 
-    if (contract.items) {
-      for (const i in contract.items) {
-        const item = contract.items[i];
+    const list = await contract.getAllListedNFT();
 
-        if (item.isListed) {
-          nfts.push(item);
-        }
-      }
+      let seedData = data.map((d) => {
+        d.imageUrl = 'https://ipfs.infura.io/ipfs/Qmf6isejKuRVLxWyY1NpMudrGp97xo5NCtamynbKrssjBi';
+
+        return d;
+      });
+
+
+    for(let i in list) {
+      seedData.push({
+        label: list[i].name,
+        imageUrl: list[i].imageUrl,
+        currentOwner: list[i].currentOwner,
+        price: list[i].price.toNumber(),
+      });
     }
 
-    return nfts;
+    return seedData;
   }
 
   const memoizedState = useMemo(() => ({

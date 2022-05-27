@@ -20,3 +20,18 @@ input, select, textarea{
 a {
     cursor: pointer;
 }
+
+.form {
+    width: 40%;
+}
+
+.form_row {
+    margin: 2em 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+input {
+    padding: 5px 10px;
+    border-radius: 5px;
+}

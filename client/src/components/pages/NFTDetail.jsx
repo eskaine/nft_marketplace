@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { EthersContext } from '../../utils/EthersProvider';
 
-function NFTDetail() {
+function NFTDetail({label, imageUrl, owner, price}) {
   const { getNFTList } = useContext(EthersContext);
   return (
     <div className="flex justify-center flex-wrap">
-      {getNFTList().map((nft) => (
+      {/* {getNFTList().map((nft) => (
         <div className="flex justify-center flex-wrap">
           <img
             src={nft.imageUrl}
@@ -27,7 +27,7 @@ function NFTDetail() {
             </div>
           </div>
         </div>
-      ))}
+      ))} */}
     </div>
   );
 }
